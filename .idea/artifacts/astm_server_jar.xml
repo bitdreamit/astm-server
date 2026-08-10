@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="astm-server:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/astm_server_jar</output-path>
+    <root id="archive" name="astm-server.jar">
+      <element id="module-output" name="astm-server" />
+    </root>
+  </artifact>
+</component>

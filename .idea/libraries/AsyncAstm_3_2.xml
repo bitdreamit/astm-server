@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="AsyncAstm-3.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../unsign/AsyncAstm-3.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="donkey-server" level="project" />
+    <orderEntry type="library" name="commons-lang3-3.13.0" level="project" />
+    <orderEntry type="library" name="mirth-server" level="project" />
+    <orderEntry type="library" name="log4j-1.2-api-2.17.2" level="project" />
+    <orderEntry type="library" name="mirth-client-core" level="project" />
+    <orderEntry type="library" name="javax.ws.rs-api-2.0.1" level="project" />
+    <orderEntry type="library" name="javax.servlet-api-3.1.0" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../unsign/astm-shared.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../unsign/AsyncAstm-3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="astm-shared" level="project" />
+    <orderEntry type="library" name="jSerialComm-2.10.4" level="project" />
+  </component>
+</module>
