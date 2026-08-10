@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="donkey-server">
-    <CLASSES>
-      <root url="jar://C:/Program Files/Mirth Connect/server-lib/donkey/donkey-server.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

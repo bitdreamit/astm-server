@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="mirth-client-core">
-    <CLASSES>
-      <root url="jar://C:/Program Files/Mirth Connect/server-lib/mirth-client-core.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
