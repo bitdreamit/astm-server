@@ -1,18 +1,8 @@
-/*
- * BitDreamIT Mirth Lab Extensions
- * Copyright (c) 2026 Kimi AI (Moonshot AI) — MIT License
- *
- * COMPLETE AstmReceiver.java — Fixed for Mirth 4.5.2 API
- */
 package com.bitdreamit.connect.astm;
 
-import com.bitdreamit.astm.asyncastm.service.connection.AstmConnectionListener;
-import com.mirth.connect.donkey.model.message.RawMessage;
 import com.mirth.connect.donkey.server.channel.DispatchResult;
 import com.mirth.connect.donkey.server.channel.SourceConnector;
 import org.apache.log4j.Logger;
-
-import java.nio.charset.Charset;
 
 public class AstmReceiver extends SourceConnector {
     private static final Logger logger = Logger.getLogger(AstmReceiver.class);
@@ -37,38 +27,17 @@ public class AstmReceiver extends SourceConnector {
         astmService = new AstmService();
         astmService.init(properties);
 
-        // Set up listener to receive data asynchronously
-        astmService.setConnectionListener(new AstmConnectionListener() {
-            @Override
-            public void onConnected() {
-                logger.info("ASTM connection established");
-            }
-
-            @Override
-            public void onDisconnected() {
-                logger.info("ASTM connection disconnected");
-            }
-
-            @Override
-            public void onDataReceived(byte[] data) {
-                try {
-                    String payload = new String(data, Charset.forName(properties.getCharsetName()));
-                    dispatchRawMessage(new RawMessage(payload));
-                } catch (Exception e) {
-                    logger.error("Error dispatching received ASTM message", e);
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                logger.error("ASTM receiver error", e);
-            }
-        });
-
         try {
             astmService.start();
             running = true;
             logger.info("AstmReceiver started with mode: " + properties.getTransportMode());
+
+            // Start the polling service thread
+            AstmReceiverService receiverService = new AstmReceiverService(this, astmService.getDriver());
+            Thread receiverThread = new Thread(receiverService);
+            receiverThread.setName("AstmReceiver-" + getChannelId());
+            receiverThread.start();
+
         } catch (Exception e) {
             logger.error("Failed to start ASTM receiver", e);
             throw new RuntimeException("ASTM receiver start failed: " + e.getMessage(), e);
@@ -99,9 +68,6 @@ public class AstmReceiver extends SourceConnector {
         }
     }
 
-    // ======================================================================
-    // FIX: Required by SourceConnector in Mirth 4.5.2
-    // ======================================================================
     @Override
     public void handleRecoveredResponse(DispatchResult dispatchResult) {
         // No recovery handling needed for ASTM

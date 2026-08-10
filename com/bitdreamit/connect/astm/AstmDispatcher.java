@@ -1,7 +1,3 @@
-/*
- * BitDreamIT Mirth Lab Extensions
- * Copyright (c) 2026 Kimi AI (Moonshot AI) — MIT License
- */
 package com.bitdreamit.connect.astm;
 
 import com.mirth.connect.donkey.model.channel.ConnectorProperties;
@@ -74,13 +70,13 @@ public class AstmDispatcher extends DestinationConnector {
 
             boolean sent = astmService.send(data);
             if (sent) {
-                return new Response(Status.SENT.toString());
+                return new Response(String.valueOf(Status.SENT));
             } else {
-                return new Response(null, Status.ERROR.toString(), "ASTM send returned false");
+                return new Response(Status.ERROR, "ASTM send returned false");
             }
         } catch (Exception e) {
             logger.error("ASTM dispatch error", e);
-            return new Response(null, Status.ERROR.toString(), e.getMessage());
+            return new Response(Status.ERROR, e.getMessage());
         }
     }
 
