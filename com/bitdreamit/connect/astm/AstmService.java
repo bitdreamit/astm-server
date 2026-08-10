@@ -13,6 +13,11 @@ public class AstmService {
     private AstmProperties properties;
     private AsyncAstmDriver driver;
 
+    // Original API: no-arg constructor
+    public AstmService() {
+    }
+
+    // Original API: init method (called by AstmReceiver and AstmDispatcher)
     public void init(AstmProperties props) {
         this.properties = props;
         this.driver = createDriver(props);
@@ -38,6 +43,7 @@ public class AstmService {
         return driver != null ? driver.receive() : new byte[0];
     }
 
+    // Original API: getDriver (called by AstmReceiver)
     public AsyncAstmDriver getDriver() {
         return driver;
     }
@@ -47,10 +53,18 @@ public class AstmService {
             case SERIAL:
                 return createSerialDriver(props);
             case TCP_SERVER:
-                return new AsyncAstmTcpDriver(props.getPort(), true, props.getAstmProtocol());
+                // FIX: Pass charset and normalize protocol case
+                return new AsyncAstmTcpDriver(
+                        props.getPort(), true,
+                        props.getAstmProtocol().trim().toUpperCase(),
+                        props.getCharsetName());
             case TCP_CLIENT:
             default:
-                return new AsyncAstmTcpDriver(props.getHost(), props.getPort(), false, props.getAstmProtocol());
+                // FIX: Pass charset and normalize protocol case
+                return new AsyncAstmTcpDriver(
+                        props.getHost(), props.getPort(), false,
+                        props.getAstmProtocol().trim().toUpperCase(),
+                        props.getCharsetName());
         }
     }
 
@@ -87,7 +101,8 @@ public class AstmService {
         }
         driver.setFlowControl(flow);
 
-        driver.setProtocol(props.getAstmProtocol());
+        // FIX #6: Normalize protocol case
+        driver.setProtocol(props.getAstmProtocol().trim().toUpperCase());
         driver.setCharset(props.getCharsetName());
         logger.info("Created Serial ASTM driver on " + props.getSerialPort());
         return driver;
