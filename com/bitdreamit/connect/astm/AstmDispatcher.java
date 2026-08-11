@@ -70,7 +70,7 @@ public class AstmDispatcher extends DestinationConnector {
 
             boolean sent = astmService.send(data);
             if (sent) {
-                return new Response(String.valueOf(Status.SENT));
+                return new Response(Status.SENT, payload);
             } else {
                 return new Response(Status.ERROR, "ASTM send returned false");
             }

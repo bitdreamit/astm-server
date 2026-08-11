@@ -17,6 +17,12 @@ import com.bitdreamit.astm.asyncastm.service.states.callback.AstmStatusCallback;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
 
+/**
+ * @deprecated This class is orphaned dead code. AstmReceiver and AstmDispatcher now use
+ *             AstmService directly, which handles driver lifecycle internally.
+ *             Kept for reference only — do not use in new code.
+ */
+@Deprecated
 public class AstmConnectionManager {
     private Logger logger = Logger.getLogger(this.getClass());
     private AsyncAstmTcpDriver asyncAstm;
