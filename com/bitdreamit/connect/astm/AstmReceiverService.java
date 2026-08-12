@@ -28,50 +28,62 @@ public class AstmReceiverService implements Runnable {
     }
 
     public void run() {
-        ReceivedMessage received = null;
         try {
             while (this.source.getCurrentState() == DeployedState.STARTED) {
                 try {
                     Map<String, Object> sourceMap = new HashMap<>();
-                    received = null;
-                    DispatchResult dispatchResult = null;
-                    received = this.asyncAstm.getReceivedMessage();
+                    ReceivedMessage received = this.asyncAstm.getReceivedMessage();
+
                     if (received.getResult().getStatus() == Status.SUCCESS) {
+                        DispatchResult dispatchResult = null;
                         try {
                             dispatchResult = this.source.dispatchRawMessage(
-                                new RawMessage(received.getMessage(), (Collection) null, sourceMap));
+                                    new RawMessage(received.getMessage(), (Collection) null, sourceMap));
+                        } catch (Exception dispatchEx) {
+                            // IMPROVED: Catch per-message dispatch failures so the listener thread survives.
+                            // Mirth queue full, database timeout, or script error should not kill the listener.
+                            this.logger.error("Failed to dispatch ASTM message to Mirth channel. Message dropped.", dispatchEx);
                         } finally {
-                            this.source.finishDispatch(dispatchResult);
+                            if (dispatchResult != null) {
+                                try {
+                                    this.source.finishDispatch(dispatchResult);
+                                } catch (Exception e) {
+                                    this.logger.error("Error finishing dispatch", e);
+                                }
+                            }
                         }
                     } else {
                         Exception exception = new Exception(
-                            received.getResult().getStatus().name() + ": " + received.getResult().getDescription());
+                                received.getResult().getStatus().name() + ": " + received.getResult().getDescription());
                         StringBuilder receivedStr = new StringBuilder();
                         receivedStr.append("\nRecovered message:\n");
                         receivedStr.append(received.getMessage());
                         this.logger.error("ASTM Receiver exception (channel: "
-                            + this.source.getChannel().getName() + ")" + receivedStr.toString(), exception);
+                                + this.source.getChannel().getName() + ")" + receivedStr.toString(), exception);
                         this.eventController.dispatchEvent(new ErrorEvent(
-                            this.source.getChannelId(), this.source.getMetaDataId(),
-                            (Long) null, ErrorEventType.SOURCE_CONNECTOR,
-                            this.source.getSourceName(),
-                            this.source.getConnectorProperties().getName(),
-                            "Error receiving ASTM message", exception));
+                                this.source.getChannelId(), this.source.getMetaDataId(),
+                                (Long) null, ErrorEventType.SOURCE_CONNECTOR,
+                                this.source.getSourceName(),
+                                this.source.getConnectorProperties().getName(),
+                                "Error receiving ASTM message", exception));
                     }
-                } catch (InterruptedException var11) {
+                } catch (InterruptedException ie) {
                     this.logger.debug("Received interruption from driver when waiting for incoming messages");
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (RuntimeException ex) {
+                    this.logger.error("Recoverable error processing ASTM message. Continuing to listen.", ex);
                 }
             }
-        } catch (Exception var13) {
-            Exception e = var13;
-            this.logger.error("ASTM Listener exception. ASTM Listener from channel "
-                + this.source.getChannel().getName() + " has been disabled", e);
+        } catch (Exception fatal) {
+            this.logger.error("ASTM Listener fatal exception. ASTM Listener from channel "
+                    + this.source.getChannel().getName() + " has been disabled", fatal);
             this.eventController.dispatchEvent(new ErrorEvent(
-                this.source.getChannelId(), this.source.getMetaDataId(),
-                (Long) null, ErrorEventType.SOURCE_CONNECTOR,
-                this.source.getSourceName(),
-                this.source.getConnectorProperties().getName(),
-                "Error in ASTM Listener", e));
+                    this.source.getChannelId(), this.source.getMetaDataId(),
+                    (Long) null, ErrorEventType.SOURCE_CONNECTOR,
+                    this.source.getSourceName(),
+                    this.source.getConnectorProperties().getName(),
+                    "Fatal Error in ASTM Listener", fatal));
         }
     }
 }

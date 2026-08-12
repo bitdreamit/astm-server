@@ -19,8 +19,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @deprecated This class is orphaned dead code. AstmReceiver and AstmDispatcher now use
- *             AstmService directly, which handles driver lifecycle internally.
- *             Kept for reference only — do not use in new code.
+ *             AstmService directly, which handles driver lifecycle internally for both TCP
+ *             and Serial modes. Kept for reference only — do not use in new code.
+ *             Safe to delete in a future cleanup release.
  */
 @Deprecated
 public class AstmConnectionManager {
@@ -92,7 +93,6 @@ public class AstmConnectionManager {
                     case STARTING:
                         AstmConnectionManager.this.setConnectorEvent(ConnectionStatusEventType.INFO, "Starting ASTM driver");
                 }
-
             }
         };
         this.asyncAstm = new AsyncAstmTcpDriver("AsyncAstm - " + connector.getChannel().getName(), statusCallback);
@@ -105,14 +105,12 @@ public class AstmConnectionManager {
         } else if (this.connectorProperties.getAstmProtocol().toUpperCase().equals("COBAS")) {
             astmProtocol = Protocol.COBAS;
         }
-
         try {
             if (this.connectorProperties.isServerMode()) {
                 this.asyncAstm.listenConnections(this.getLocalPort(), this.getAddressBind(), astmProtocol);
             } else {
                 this.asyncAstm.initiateConnection(this.getRemoteAddress(), this.getRemotePort(), astmProtocol);
             }
-
         } catch (Exception var5) {
             Exception e = var5;
             this.setConnectorEvent(ConnectionStatusEventType.FAILURE, e.getMessage());
@@ -135,7 +133,6 @@ public class AstmConnectionManager {
                 firstCause = new ConnectorTaskException("Unable to stop ASTM connection", e);
             }
         }
-
         if (firstCause != null) {
             throw firstCause;
         } else {
